@@ -17,3 +17,6 @@ docker compose run rust-app
     ```bash
     docker run -v ./:/app rust-app-builder cargo update
     ```
+
+## Links
+- Leaning https://doc.rust-lang.org/stable/book/index.html
