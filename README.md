@@ -5,18 +5,33 @@ docker compose build
 
 ## Run
 ```bash
-docker compose run rust-app
+docker compose run app cargo run
+```
+
+## Check
+```bash
+docker compose run app cargo check
 ```
 
 ## Lock cargo deps
-1. Build builder
-    ```bash
-    docker build --target=builder -t rust-app-builder .
-    ```
-1. Update Cargo
-    ```bash
-    docker run -v ./:/app rust-app-builder cargo update
-    ```
+```bash
+docker compose run app cargo update
+```
+
+## Prettify code
+```bash
+docker compose run app cargo fmt
+```
+
+## Analize code
+```bash
+docker compose run app cargo clippy
+```
+
+## Build release app
+1. Uncomment publish section at `compose.yaml`
+1. Build `docker compose build`
+1. Run `docker compose run release`
 
 ## Links
-- Leaning https://doc.rust-lang.org/stable/book/index.html
+- Leaning https://doc.rust-lang.ru/book/
