@@ -1,0 +1,7 @@
+services:
+  rust-app:
+    build: .
+    container_name: rust-app
+    working_dir: /var/www
+    volumes:
+      - .:/app
