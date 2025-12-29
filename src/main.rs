@@ -1,13 +1,21 @@
 fn main() {
-    let number = 3;
+    let mut count = 0;
+    'counting_up: loop {
+        println!("count = {count}");
+        let mut remaining = 10;
 
-    if number != 0 {
-        println!("Число не равно 0");
-    }
+        loop {
+            println!("remaining = {remaining}");
+            if remaining == 9 {
+                break;
+            }
+            if count == 2 {
+                break 'counting_up;
+            }
+            remaining -= 1;
+        }
 
-    if number < 5 {
-        println!("Число строго меньше пяти");
-    } else if number > 1 {
-        println!("Число больше единицы");
+        count += 1;
     }
+    println!("End count = {count}");
 }
