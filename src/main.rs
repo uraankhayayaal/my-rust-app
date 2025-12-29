@@ -1,6 +1,6 @@
+use rand::Rng;
 use std::cmp::Ordering;
 use std::io;
-use rand::Rng;
 
 extern crate rand;
 
@@ -34,7 +34,7 @@ fn main() {
             Ordering::Equal => {
                 println!("You win!");
                 break;
-            },
+            }
         }
     }
 }
