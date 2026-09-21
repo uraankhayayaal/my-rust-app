@@ -1,0 +1,29 @@
+# CI/CD pipeline для my-rust-app
+# Локальный стек: Docker Compose. Прод: Kubernetes-манифесты (отдельно).
+# Автотесты запускаются внутри контейнера через compose: `cargo test`.
+
+stages:
+  - build
+  - test
+  - lint
+
+# --- Сборка и прогон автотестов в dev-образе ---
+build:
+  stage: build
+  script:
+    - docker compose build
+    # Точная команда автотестирования, доступная внутри контейнера
+    - docker compose run --rm app cargo test
+
+lint:
+  stage: lint
+  script:
+    - docker compose run --rm app cargo clippy
+    - docker compose run --rm app cargo fmt -- --check
+
+# --- Деплой в прод (Kubernetes) ---
+# Манифесты лежат в k8s/ и применяются через kubectl.
+# deploy:
+#   stage: deploy
+#   script:
+#     - kubectl apply -f k8s/
