@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-rust-app
+  namespace: my-rust-app
+  labels:
+    app: my-rust-app
+spec:
+  selector:
+    app: my-rust-app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  type: ClusterIP

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-rust-app
+  namespace: my-rust-app
+  labels:
+    app: my-rust-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-rust-app
+  template:
+    metadata:
+      labels:
+        app: my-rust-app
+    spec:
+      containers:
+        - name: app
+          image: registry.example.com/my-rust-app:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: my-rust-app-config
+                  key: LOG_LEVEL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
