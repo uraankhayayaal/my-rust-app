@@ -74,3 +74,8 @@ func main() {
 func version() string {
 	return "v1.0.0-e2e"
 }
+
+// boolEven возвращает true, если n чётное (E2E-проверка авто-коммита/MR).
+func boolEven(n int) bool {
+	return n%2 == 0
+}
