@@ -1,29 +1,38 @@
-# CI/CD pipeline для my-rust-app
-# Локальный стек: Docker Compose. Прод: Kubernetes-манифесты (отдельно).
-# Автотесты запускаются внутри контейнера через compose: `cargo test`.
+# CI/CD pipeline for my-rust-app (Go)
+# Local stack: Docker Compose. Prod: Kubernetes manifests (separate).
+# Unit tests run inside container via compose: `go test`.
 
 stages:
   - build
   - test
   - lint
+  - deploy
 
-# --- Сборка и прогон автотестов в dev-образе ---
+# --- Build and run unit tests in dev image ---
 build:
   stage: build
   script:
     - docker compose build
-    # Точная команда автотестирования, доступная внутри контейнера
+    - docker compose run --rm app go test ./...
+
+# --- QA integration tests (logging output to stdout) ---
+test:
+  stage: test
+  script:
     - docker compose run --rm app cargo test
+    - docker compose run --rm app cargo test -- --nocapture
 
 lint:
   stage: lint
   script:
-    - docker compose run --rm app cargo clippy
-    - docker compose run --rm app cargo fmt -- --check
+    - docker compose run --rm app go vet ./...
+    - docker compose run --rm app gofmt -l .
 
-# --- Деплой в прод (Kubernetes) ---
-# Манифесты лежат в k8s/ и применяются через kubectl.
-# deploy:
-#   stage: deploy
-#   script:
-#     - kubectl apply -f k8s/
+# --- Deploy to prod (Kubernetes) ---
+# Manifests live in k8s/ and are applied via kubectl.
+deploy:
+  stage: deploy
+  script:
+    - kubectl apply -f k8s/ --namespace=my-rust-app
+  only:
+    - main

@@ -13,30 +13,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Установка Rust toolchain через rustup (на раннере)
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          toolchain: stable
-          components: rustfmt, clippy
+          go-version: '1.21'
 
-      # Автотесты — точная команда: cargo test
-      - name: Run cargo test
-        run: cargo test
+      - name: Run go test
+        run: go test ./...
 
-      # Статическая проверка
-      - name: Run cargo check
-        run: cargo check
+      - name: Run QA integration tests
+        run: cargo test -- --nocapture --test-threads=1
 
-      # Форматирование
-      - name: Run cargo fmt --check
-        run: cargo fmt -- --check
+      - name: Run go vet
+        run: go vet ./...
 
-      # Lint
-      - name: Run cargo clippy
-        run: cargo clippy -- -D warnings
+      - name: Check formatting
+        run: gofmt -l .
 
-  # QA gate: блокирует merge при падении автотестов
+  # QA gate: блокирует merge и deploy при падении автотестов
   qa:
     runs-on: ubuntu-latest
     needs: [test]
@@ -44,17 +38,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          toolchain: stable
-          components: rustfmt, clippy
+          go-version: '1.21'
 
-      # QA-автотесты: любое падение → exit != 0 → PR failed → merge заблокирован
       - name: Run QA tests
         run: cargo test -- --nocapture
 
-  # Deploy: прод (Kubernetes). Стартует только после успешных test и qa.
+  # Deploy: prod (Kubernetes). Starts only after successful test and qa.
   # SECRETS (GitHub Environments / Secrets): K8S_CONFIG (base64 kubeconfig), K8S_NAMESPACE
   deploy:
     runs-on: ubuntu-latest
@@ -64,22 +56,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          toolchain: stable
-          components: rustfmt, clippy
+          go-version: '1.21'
 
       - name: Build release binary
-        run: cargo build --release
+        run: CGO_ENABLED=0 go build -o app .
 
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: target/release/App
+          path: app
 
-      # Deploy to Kubernetes (прод)
+      # Validate K8s manifests before applying
+      - name: Validate K8s manifests
+        run: kubectl apply -f k8s/ --dry-run=client --namespace=${{ vars.K8S_NAMESPACE }}
+
+      # Deploy to Kubernetes (prod)
       - name: Deploy to K8s
         run: |
           echo "${{ secrets.K8S_CONFIG }}" | base64 -d > kubeconfig

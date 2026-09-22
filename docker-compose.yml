@@ -7,4 +7,16 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-    command: cargo run
+      - app-logs:/app/logs
+    command: go run .
+    environment:
+      LOG_LEVEL: info
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # QA: docker compose run --rm app go test ./...
+
+volumes:
+  app-logs:

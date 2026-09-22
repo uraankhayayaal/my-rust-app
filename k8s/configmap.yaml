@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-rust-app-config
+  namespace: my-rust-app
+  labels:
+    app: my-rust-app
+data:
+  LOG_LEVEL: info

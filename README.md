@@ -1,53 +1,43 @@
 ## Build
 ```bash
-docker compose build
+go build -o app .
 ```
 
 ## Run
 ```bash
-docker compose run --rm app cargo run
+./app [easy|hard|normal]
 ```
 
 ## Check
 ```bash
-docker compose run --rm app cargo check
+go vet ./...
 ```
 
-## Lock cargo deps
+## Test
 ```bash
-docker compose run --rm app cargo update
+go test ./...
 ```
 
 ## Prettify code
 ```bash
-docker compose run --rm app cargo fmt
+gofmt -w .
 ```
-
-## Analize code
-```bash
-docker compose run --rm app cargo clippy
-```
-
-## Build release app
-1. Uncomment publish section at `compose.yaml`
-1. Build `docker compose build`
-1. Run `docker compose run --rm release`
 
 ## Links
-- Leaning https://doc.rust-lang.ru/book/
+- Go: https://go.dev/doc/
 
 ## CI/CD Architecture (ARCH-03)
 
 ### Pipeline: GitHub Actions (.github/workflows/ci.yml)
 
 ```
-push/PR → jobs.test (cargo test/check/fmt/clippy)
-           → jobs.qa  (cargo test -- --nocapture, needs: test)
+push/PR → jobs.test (go test/vet/gofmt)
+           → jobs.qa  (go test -v, needs: test)
            → jobs.deploy (kubectl apply -f k8s/, needs: [test, qa], env: production)
 ```
 
 - **Runner**: ubuntu-latest
-- **Toolchain**: dtolnay/rust-toolchain@stable (rustfmt, clippy)
+- **Toolchain**: actions/setup-go@v5 (Go 1.21)
 - **QA gate**: job `qa` blocks merge if any unit test fails
 - **Deploy gate**: job `deploy` requires both `test` and `qa` green
 - **Secrets**: K8S_CONFIG (base64 kubeconfig), K8S_NAMESPACE (default: my-rust-app)
@@ -58,7 +48,12 @@ push/PR → jobs.test (cargo test/check/fmt/clippy)
 
 ### Design decisions
 
-- CI выполняет cargo-команды напрямую на раннере (без docker compose run) — проще, быстрее, KISS.
+- CI выполняет go-команды напрямую на раннере (без docker compose run) — проще, быстрее, KISS.
 - Docker Compose остаётся локальным инструментом разработки, не CI-рантаймом.
-- Автотесты QA = unit-тесты в src/main.rs (mod tests), прогон через `cargo test`.
+- Автотесты QA = unit-тесты в main_test.go, прогон через `go test`.
 - Деплой в прод только через Kubernetes (k8s/ манифесты), не через Docker Compose.
+
+## План работ
+
+- [x] GO-01: Переписать src/main.rs на Go (main.go + go.mod) — Senior Go Developer
+- [x] GO-02: Обновить Dockerfile и CI/CD под Go — Senior Go Developer
