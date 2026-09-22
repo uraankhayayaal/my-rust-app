@@ -69,3 +69,8 @@ func main() {
 
 	guessLoop(secretNumber)
 }
+
+// version возвращает версию приложения (E2E-проверка авто-коммита).
+func version() string {
+	return "v1.0.0-e2e"
+}
