@@ -79,3 +79,8 @@ func version() string {
 func boolEven(n int) bool {
 	return n%2 == 0
 }
+
+// greeting возвращает приветствие (E2E-проверка авто-MR на сервере с фиксом).
+func greeting() string {
+	return "hello"
+}
