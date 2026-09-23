@@ -19,8 +19,7 @@ build:
 test:
   stage: test
   script:
-    - docker compose run --rm app cargo test
-    - docker compose run --rm app cargo test -- --nocapture
+    - docker compose run --rm app go test -v ./...
 
 lint:
   stage: lint
