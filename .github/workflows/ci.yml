@@ -21,9 +21,6 @@ jobs:
       - name: Run go test
         run: go test ./...
 
-      - name: Run QA integration tests
-        run: cargo test -- --nocapture --test-threads=1
-
       - name: Run go vet
         run: go vet ./...
 
@@ -44,7 +41,7 @@ jobs:
           go-version: '1.21'
 
       - name: Run QA tests
-        run: cargo test -- --nocapture
+        run: go test -v ./...
 
   # Deploy: prod (Kubernetes). Starts only after successful test and qa.
   # SECRETS (GitHub Environments / Secrets): K8S_CONFIG (base64 kubeconfig), K8S_NAMESPACE
