@@ -1,3 +1,5 @@
+# guess-number
+
 ## Build
 ```bash
 go build -o app .
@@ -57,3 +59,4 @@ push/PR → jobs.test (go test/vet/gofmt)
 
 - [x] GO-01: Переписать src/main.rs на Go (main.go + go.mod) — Senior Go Developer
 - [x] GO-02: Обновить Dockerfile и CI/CD под Go — Senior Go Developer
+- [x] GO-CLEANUP-01: Убрать «хвосты» от Rust (модуль, README, бинарник, CI) — Senior Go Developer
