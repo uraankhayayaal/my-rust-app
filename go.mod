@@ -1,3 +1,3 @@
-module my-rust-app
+module guess-number
 
 go 1.21
