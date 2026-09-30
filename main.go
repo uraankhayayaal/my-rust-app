@@ -57,7 +57,7 @@ func guessLoop(secretNumber uint32) bool {
 	}
 }
 func main() {
-	log, err := logger.NewLogger("app.log")
+	log, err := logger.NewLogger("app.log", 10*1024*1024)
 	if err != nil {
 		fmt.Printf("Could not initialize logger: %v\n", err)
 		os.Exit(1)
