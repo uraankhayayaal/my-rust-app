@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"guess-number/internal/logger"
 )
 
 // maxValueFrom возвращает верхнюю границу диапазона генерации
@@ -54,8 +56,15 @@ func guessLoop(secretNumber uint32) bool {
 		}
 	}
 }
-
 func main() {
+	log, err := logger.NewLogger("app.log")
+	if err != nil {
+		fmt.Printf("Could not initialize logger: %v\n", err)
+		os.Exit(1)
+	}
+	defer log.Close()
+
+	log.Log("Application started")
 	fmt.Println("Guess the number!")
 
 	difficulty := "normal"
@@ -65,9 +74,11 @@ func main() {
 	maxValue := maxValueFrom(difficulty)
 	secretNumber := uint32(rand.Intn(int(maxValue))) + 1
 
+	log.Log(fmt.Sprintf("Secret number generated: %d, Difficulty: %s", secretNumber, difficulty))
 	fmt.Printf("The secret number is: %d (difficulty: %s, max: %d)\n", secretNumber, difficulty, maxValue)
 
 	guessLoop(secretNumber)
+	log.Log("Game finished")
 }
 
 // version возвращает версию приложения (E2E-проверка авто-коммита).
