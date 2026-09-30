@@ -1,1 +1,4 @@
 target
+app
+my-rust-app
+*.exe
